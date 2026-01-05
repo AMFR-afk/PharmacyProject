@@ -42,7 +42,7 @@ namespace PharmacyProject.Controllers
             new Prop { Name = "Glimepiride 4 mg", Price = 2.50, Details = "Lowers blood sugar." }
         };
 
-                _context.PropTable.AddRange(initialMedicines); // ضيفهم كلهم مرة واحدة
+                _context.PropTable.AddRange(initialMedicines); // إضافة الادوية للداتابيز
                 _context.SaveChanges(); // احفظ في الداتابيز
             }
         }

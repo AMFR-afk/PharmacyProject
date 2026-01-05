@@ -1,68 +1,101 @@
-﻿@model List<PharmacyProject.Models.Prop>
+﻿@model IEnumerable<PharmacyProject.Models.Prop>
 
 @{
-    ViewData["Title"] = "Medicine List";
+    ViewData["Title"] = "Pharmacy Store";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary"><i class="bi bi-capsule"></i> Available Medicines</h2>
-    </div>
+<style>
+    .glass-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        margin-bottom: 3rem;
+    }
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light text-secondary">
-                    <tr>
-                        <th class="ps-4">Name</th>
-                        <th>Price</th>
-                        <th>Details</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-end pe-4">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="ps-4 fw-bold">@item.Name</td>
-                            <td class="text-success fw-bold">@item.Price.ToString("C")</td>
-                            <td class="text-muted small">@item.Details</td>
-                            
-                            <form asp-action="AddToCart" method="post">
-                                <input type="hidden" name="id" value="@item.Id" />
-                                
-                                <td class="text-center">
-                                    <div class="input-group input-group-sm d-inline-flex w-auto">
-                                        <button type="button" class="btn btn-outline-secondary" onclick="updateQty(@item.Id, -1)">-</button>
-                                        <input type="number" id="qty-Input-@item.Id" name="quantity" value="1" class="form-control text-center" style="width: 50px;" min="1" readonly>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="updateQty(@item.Id, 1)">+</button>
-                                    </div>
-                                </td>
+    .medicine-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-                                <td class="text-end pe-4">
-                                    <div class="btn-group">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Info</a>
-                                        <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
-                                    </div>
-                                </td>
-                            </form>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        .medicine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        }
+
+    .btn-gradient {
+        background: linear-gradient(45deg, #11998e, #38ef7d);
+        border: none;
+        color: white;
+    }
+
+        .btn-gradient:hover {
+            background: linear-gradient(45deg, #38ef7d, #11998e);
+            color: white;
+        }
+</style>
+
+<div class="container py-4">
+
+    <div class="glass-header text-center">
+        <h1 class="display-4 fw-bold mb-3">Pharmacy Care+</h1>
+        <p class="lead opacity-75">Your health is our priority. Find the best medicines here.</p>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <div class="input-group shadow rounded-pill overflow-hidden bg-white p-1">
+                    <input type="text" class="form-control border-0 shadow-none ps-3" placeholder="Search for medicine...">
+                    <button class="btn btn-primary rounded-pill px-4 fw-bold" type="button">Search</button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    function updateQty(id, change) {
-        let input = document.getElementById("qty-Input-" + id);
-        let currentVal = parseInt(input.value);
-        let newVal = currentVal + change;
-        
-        if (newVal >= 1) {
-            input.value = newVal;
-        }
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="text-muted mb-3"><i class="bi bi-inbox fs-1"></i></div>
+            <h4 class="text-muted">No medicines available at the moment.</h4>
+        </div>
     }
-</script>
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 medicine-card border-0 shadow-sm rounded-4 overflow-hidden">
+
+                        <div class="card-img-top bg-light text-center py-4 text-primary bg-opacity-10">
+                            <i class="bi bi-capsule-pill display-1"></i>
+                        </div>
+
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold text-dark">@item.Name</h5>
+                            <p class="card-text text-muted small px-3">
+                                @(item.Details.Length > 50 ? item.Details.Substring(0, 50) + "..." : item.Details)
+                            </p>
+                            <h4 class="text-primary fw-bold my-3">@item.Price.ToString("0.00") JOD</h4>
+
+                            <div class="d-grid gap-2">
+                                <form asp-action="AddToCart" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="id" value="@item.Id" />
+
+                                    <div class="form-floating w-25">
+                                        <input type="number" name="quantity" value="1" min="1" max="10" class="form-control border-secondary form-control-sm" id="qty-@item.Id" placeholder="Qty">
+                                        <label for="qty-@item.Id" class="small">Qty</label>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-gradient flex-grow-1 rounded-3 fw-bold shadow-sm">
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                </form>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm rounded-3">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

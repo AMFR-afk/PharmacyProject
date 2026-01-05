@@ -1,47 +1,58 @@
-﻿@model PharmacyProject.Models.Prop  
+﻿@model PharmacyProject.Models.Prop
+
 @{
     ViewData["Title"] = "Edit Medicine";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6">
-        <div class="card shadow border-0">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">Edit Medicine</h4>
-            </div>
-            <div class="card-body bg-light">
-                <form asp-action="Edit" method="post">
-                    
-                    <input type="hidden" asp-for="Id" />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
 
-                    <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-bold">Medicine Name</label>
-                        <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger small"></span>
-                    </div>
+                <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
+                    <h3 class="fw-bold text-white mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Medicine</h3>
+                    <p class="text-white-50 small mb-0">Update medicine information</p>
+                </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Details" class="form-label fw-bold">Description</label>
-                        <textarea asp-for="Details" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Details" class="text-danger small"></span>
-                    </div>
+                <div class="card-body p-5 bg-white">
+                    <form asp-action="Edit" method="post">
 
-                    <div class="mb-3">
-                        <label asp-for="Price" class="form-label fw-bold">Price</label>
-                        <input asp-for="Price" class="form-control" type="number" step="0.01" />
-                        <span asp-validation-for="Price" class="text-danger small"></span>
-                    </div>
+                        <input type="hidden" asp-for="Id" />
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-warning fw-bold">Save Changes</button>
-                        <a asp-action="AdminTable" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Name" class="form-control rounded-3" placeholder="Medicine Name" />
+                            <label asp-for="Name">Medicine Name</label>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Details" class="form-control rounded-3" placeholder="Description" style="height: 120px"></textarea>
+                            <label asp-for="Details">Description</label>
+                            <span asp-validation-for="Details" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Price" class="form-control rounded-3" type="number" step="0.01" placeholder="Price" />
+                            <label asp-for="Price">Price (JOD)</label>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold rounded-3 text-white shadow-sm" style="background: linear-gradient(45deg, #f09819, #edde5d); border: none;">
+                                Save Changes
+                            </button>
+                            <a asp-action="AdminTable" class="btn btn-outline-secondary rounded-3">Cancel</a>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
