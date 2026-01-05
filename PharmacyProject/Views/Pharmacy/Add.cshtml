@@ -1,0 +1,51 @@
+﻿@model PharmacyProject.Models.Prop
+
+@{
+    ViewData["Title"] = "Add Medicine";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Add New Medicine</h4>
+            </div>
+            <div class="card-body bg-light">
+                <form asp-action="Add" method="post">
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Medicine Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="e.g. Panadol" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Details" class="form-label fw-bold">Description</label>
+                        <textarea asp-for="Details" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Details" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Price" class="form-label fw-bold">Price (JOD)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                        </div>
+                        <span asp-validation-for="Price" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Save Medicine</button>
+                        <a asp-action="Table" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

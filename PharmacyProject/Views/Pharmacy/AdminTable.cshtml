@@ -1,0 +1,53 @@
+﻿@model List<PharmacyProject.Models.Prop>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger"><i class="bi bi-shield-lock"></i> Admin Dashboard</h2>
+        <a asp-action="Add" class="btn btn-success shadow-sm">
+            + Add New Medicine
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th class="ps-4">Name</th>
+                        <th>Price</th>
+                        <th>Details</th>
+                        <th class="text-center">Control Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">@item.Name</td>
+                            <td class="text-success fw-bold">@item.Price.ToString("C")</td>
+                            <td class="text-muted small">@item.Details</td>
+
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm text-dark">
+                                        Edit
+                                    </a>
+
+                                    <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
