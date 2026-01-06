@@ -41,7 +41,16 @@ namespace PharmacyProject.Controllers
             new Prop { Name = "Omeprazole 20 mg", Price = 3.00, Details = "Reduces stomach acid." },
             new Prop { Name = "Ibuprofen 200 mg", Price = 1.50, Details = "Pain and inflammation relief." },
             new Prop { Name = "Amlodipine 10 mg", Price = 1.00, Details = "Treats hypertension." },
-            new Prop { Name = "Glimepiride 4 mg", Price = 2.50, Details = "Lowers blood sugar." }
+            new Prop { Name = "Glimepiride 4 mg", Price = 2.50, Details = "Lowers blood sugar." },
+            new Prop { Name = "Vitamin B", Price = 4.50, Details = "Supports energy production and nervous system health" },
+            new Prop { Name = "Iron Supplement", Price = 5.25, Details = "Used to prevent and treat iron deficiency anemia" },
+            new Prop { Name = "Calcium", Price = 4.00, Details = "Essential for strong bones and teeth" },
+            new Prop { Name = "Omega 3", Price = 7.50, Details = "Supports heart and brain health" },
+            new Prop { Name = "Zinc", Price = 3.50, Details = "Strengthens immune system and supports healing" },
+            new Prop { Name = "Magnesium", Price = 4.75, Details = "Helps with muscle function and relaxation" },
+            new Prop { Name = "Pain Relief Tablets", Price = 2.50, Details = "Used to relieve mild to moderate pain" },
+            new Prop { Name = "Cough Syrup", Price = 3.25, Details = "Relieves cough and soothes throat irritation" },
+            new Prop { Name = "Antibiotic Capsules", Price = 6.80, Details = "Used to treat bacterial infections" },
         };
 
                 _context.PropTable.AddRange(initialMedicines); // إضافة الادوية للداتابيز
