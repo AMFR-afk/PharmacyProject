@@ -43,10 +43,27 @@
 
         <div class="row justify-content-center mt-4">
             <div class="col-md-6">
-                <div class="input-group shadow rounded-pill overflow-hidden bg-white p-1">
-                    <input type="text" class="form-control border-0 shadow-none ps-3" placeholder="Search for medicine...">
-                    <button class="btn btn-primary rounded-pill px-4 fw-bold" type="button">Search</button>
-                </div>
+                <form asp-action="Table" method="get">
+                    <div class="input-group shadow rounded-pill overflow-hidden bg-white p-1">
+
+                        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"
+                               class="form-control border-0 shadow-none ps-3"
+                               placeholder="Search for medicine name or details...">
+
+                        <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
+                    </div>
+
+                    @if (ViewData["CurrentFilter"] != null)
+                    {
+                        <div class="text-center mt-2">
+                            <a asp-action="Table" class="text-white text-decoration-none small opacity-75 hover-opacity-100">
+                                <i class="bi bi-x-circle"></i> Clear Search
+                            </a>
+                        </div>
+                    }
+                </form>
             </div>
         </div>
     </div>

@@ -8,6 +8,8 @@ using PharmacyProject.Models;      // Medicine, CartItem, ErrorViewModel
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace PharmacyProject.Controllers
 {
@@ -51,15 +53,33 @@ namespace PharmacyProject.Controllers
         // Home / Medicines Talbe
         // =======================
 
-        public IActionResult Table()
+       
+        [HttpGet]
+        public IActionResult Table(string searchString)
         {
-            if (HttpContext.Session.GetString("UserName") == null) // تعديل لفحص السشن
+            
+            if (HttpContext.Session.GetString("UserName") == null) //  فحص تسجيل الدخول
             {
                 return RedirectToAction("Login");
             }
 
-            var data = _context.PropTable.ToList();
-            return View(data);
+           
+            var medicines = from m in _context.PropTable 
+                            select m;//  جلب كل الأدوية من الداتابيز
+
+
+
+            if (!string.IsNullOrEmpty(searchString))//  إذا المستخدم كتب شي في البحث
+            {
+                // ابحث في الاسم أو التفاصيل
+                medicines = medicines.Where(s => s.Name.Contains(searchString) || s.Details.Contains(searchString));
+            }
+
+            // 4. حفظ كلمة البحث عشان ترجع تنعرض في المربع (User Friendly)
+            ViewData["CurrentFilter"] = searchString;
+
+            // 5. تنفيذ الاستعلام وإرسال النتائج
+            return View(medicines.ToList());
         }
 
         public IActionResult Details(int id)
@@ -91,13 +111,13 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(Prop model) // [cite: 133]
+        public async Task<IActionResult> Add(Prop model) 
         {
             if (ModelState.IsValid)
             {
                 // إضافة الدواء للداتابيز
-                await _context.PropTable.AddAsync(model); // [cite: 136]
-                await _context.SaveChangesAsync();        // [cite: 137]
+                await _context.PropTable.AddAsync(model); 
+                await _context.SaveChangesAsync();        
 
                 return RedirectToAction("AdminTable");
             }
@@ -109,10 +129,10 @@ namespace PharmacyProject.Controllers
         // =======================
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id) // [cite: 163]
+        public async Task<IActionResult> Edit(int id) 
         {
             // البحث عن الدواء بواسطة الـ ID
-            var medicine = await _context.PropTable.FindAsync(id); // [cite: 157]
+            var medicine = await _context.PropTable.FindAsync(id); 
 
             if (medicine == null)
             {
@@ -123,20 +143,20 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Prop model) // [cite: 163]
+        public async Task<IActionResult> Edit(Prop model) 
         {
             // 1. نجيب الدواء الأصلي من الداتابيز
-            var existingMedicine = await _context.PropTable.FindAsync(model.Id); // [cite: 159]
+            var existingMedicine = await _context.PropTable.FindAsync(model.Id); 
 
             if (existingMedicine != null)
             {
-                // 2. نعدل البيانات (Mapping) زي ما هو بالسلايد
+                // 2. نعدل البيانات (Mapping) 
                 existingMedicine.Name = model.Name;
                 existingMedicine.Price = model.Price;
                 existingMedicine.Details = model.Details;
 
                 // 3. نحفظ التغييرات
-                await _context.SaveChangesAsync(); // [cite: 160]
+                await _context.SaveChangesAsync(); 
 
                 return RedirectToAction("AdminTable");
             }
@@ -203,16 +223,26 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public IActionResult RemoveFromCart(int medicineId)
         {
-            var cart = HttpContext.Session.GetObject<List<CartItem>>("CART")
-                       ?? new List<CartItem>();
+            // 1. جلب السلة من السشن
+            var cart = HttpContext.Session.GetObject<List<CartItem>>("CART");
 
-            var item = cart.FirstOrDefault(x => x.MedicineId == medicineId);
-            if (item != null)
-                cart.Remove(item);
+            if (cart != null)
+            {
+                // 2. البحث عن العنصر وحذفه
+                var item = cart.FirstOrDefault(i => i.MedicineId == medicineId);
+                if (item != null)
+                {
+                    cart.Remove(item);
 
-            HttpContext.Session.SetObject("CART", cart);
+                    // 3. تحديث السشن بالسلة الجديدة
+                    HttpContext.Session.SetObject("CART", cart);
+                }
+            }
+
+            // 4. الرجوع لصفحة السلة
             return RedirectToAction("Cart");
         }
 
@@ -229,12 +259,16 @@ namespace PharmacyProject.Controllers
         public IActionResult Checkout()
         {
             // 1. فحص تسجيل الدخول: هل المستخدم مسجل دخول؟
-            if (HttpContext.Session.GetString("UserName") == null)
+            // بنجيب الإيميل المخزن في السشن (تأكد إنك خزنته في Login)
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userName = HttpContext.Session.GetString("UserName");
+
+            if (userName == null || userEmail == null)
             {
                 return RedirectToAction("Login"); // إذا مش مسجل، روح سجل دخول أول
             }
 
-            // 2. يجيب السلة
+            // 2. جلب السلة
             var cart = HttpContext.Session.GetObject<List<CartItem>>("CART");
 
             // فحص إذا السلة فاضية
@@ -243,10 +277,17 @@ namespace PharmacyProject.Controllers
                 return RedirectToAction("Table"); // ما في شي تشتريه، ارجع عالسوق
             }
 
-            // تفريغ السلة بعد الشراء
+            // ==========================================
+            // 🔥 هون المكان الصحيح لإرسال الإيميل 🔥
+            // ==========================================
+            SendOrderEmail("novateam2026@gmail.com", userEmail, userName, cart);
+
+            // ==========================================
+
+            // 3. تفريغ السلة بعد الشراء (عشان ما يشتري نفس الغراض مرتين)
             HttpContext.Session.Remove("CART");
 
-            // توجيه لصفحة نجاح الطلب
+            // 4. توجيه لصفحة نجاح الطلب
             return View("OrderSuccess");
         }
 
@@ -271,30 +312,38 @@ namespace PharmacyProject.Controllers
                 var exist = await _context.UserData
                                           .FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
 
-                if (exist == null) // إذا الإيميل مش موجود
+                if (exist == null)
                 {
                     ModelState.AddModelError("", "الإيميل أو كلمة المرور غير صحيحة");
                     return View(model);
                 }
 
-                
-                if (exist.Password != model.Password)//  اذا كلمة المرور غلط
+                if (exist.Password != model.Password)
                 {
                     ModelState.AddModelError("", "الإيميل أو كلمة المرور غير صحيحة");
                     return View(model);
                 }
 
-                
-                // حفظ السشن
+                // ===============================================
+                // هون المكان الصحيح! (لأن الدخول نجح)
+                // ===============================================
+
+                // حفظنا الاسم عشان الترحيب
                 HttpContext.Session.SetString("UserName", exist.Name);
-                HttpContext.Session.SetString("Role", exist.Role); // بنحفظ الرول كمان عشان نستخدمه بعدين
 
-                // توزيع الصلاحيات
+                // حفظنا الرول عشان الصلاحيات
+                HttpContext.Session.SetString("Role", exist.Role);
+
+                // 🔥 حفظنا الإيميل عشان نستخدمه في إيميل الطلب (Checkout) 🔥
+                HttpContext.Session.SetString("UserEmail", exist.Email);
+
+                // ===============================================
+
                 if (exist.Role == "ADMIN")
                 {
                     return RedirectToAction("AdminTable");
                 }
-                else // أي شي غير أدمن يعتبر يوزر
+                else
                 {
                     return RedirectToAction("Table");
                 }
@@ -352,5 +401,89 @@ namespace PharmacyProject.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
+
+        // =======================
+        // Email Helper Helper
+        // =======================
+        private void SendOrderEmail(string adminEmail, string userEmail, string userName, List<CartItem> cart)
+        {
+            try
+            {
+                var message = new MimeMessage();
+
+                // 1. إعدادات المرسل والمستقبل
+                // المرسل: إيميل الصيدلية الجديد
+                message.From.Add(new MailboxAddress("Nova Pharmacy Team", "novateam2026@gmail.com"));
+
+                // المستقبل: إيميل الأدمن (هو نفسه نوفا تيم حسب طلبك)
+                message.To.Add(new MailboxAddress("Admin", "novateam2026@gmail.com"));
+
+                message.Subject = $"New Order Alert: {userName}";
+
+                // 2. بناء محتوى الإيميل (HTML Table)
+                var bodyBuilder = new BodyBuilder();
+
+                // بداية الجدول وتنسيقه
+                string emailBody = $@"
+            <div style='font-family: Arial, sans-serif; color: #333;'>
+                <h2 style='color: #0d6efd;'>New Order Received!</h2>
+                <p><strong>Customer Name:</strong> {userName}</p>
+                <p><strong>Customer Email:</strong> {userEmail}</p>
+                <hr>
+                <table style='width: 100%; border-collapse: collapse; border: 1px solid #ddd;'>
+                    <tr style='background-color: #f8f9fa;'>
+                        <th style='padding: 10px; border: 1px solid #ddd; text-align: left;'>Medicine</th>
+                        <th style='padding: 10px; border: 1px solid #ddd; text-align: center;'>Qty</th>
+                        <th style='padding: 10px; border: 1px solid #ddd; text-align: right;'>Price</th>
+                        <th style='padding: 10px; border: 1px solid #ddd; text-align: right;'>Total</th>
+                    </tr>";
+
+                // حلقة تكرار لإضافة الأدوية سطر سطر
+                double grandTotal = 0;
+                foreach (var item in cart)
+                {
+                    emailBody += $@"
+                    <tr>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>{item.Name}</td>
+                        <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{item.Quantity}</td>
+                        <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>{item.Price:F2} JOD</td>
+                        <td style='padding: 8px; border: 1px solid #ddd; text-align: right;'>{item.LineTotal:F2} JOD</td>
+                    </tr>";
+                    grandTotal += item.LineTotal;
+                }
+
+                // إغلاق الجدول وإضافة المجموع الكلي
+                emailBody += $@"
+                    <tr style='background-color: #e9ecef; font-weight: bold;'>
+                        <td colspan='3' style='padding: 10px; border: 1px solid #ddd; text-align: right;'>Grand Total</td>
+                        <td style='padding: 10px; border: 1px solid #ddd; text-align: right; color: #198754;'>{grandTotal:F2} JOD</td>
+                    </tr>
+                </table>
+                <br>
+                <p style='font-size: 12px; color: #777;'>Sent automatically from Nova Pharmacy System.</p>
+            </div>";
+
+                bodyBuilder.HtmlBody = emailBody;
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // 3. الاتصال والإرسال
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+                    // الاتصال (بما إنه 465 زبط معك خليه زي ما هو)
+                    client.Connect("smtp.gmail.com", 465, MailKit.Security.SecureSocketOptions.SslOnConnect);
+
+                    // الدخول (تأكد من وضع App Password الخاص بـ novateam2026)
+                    client.Authenticate("novateam2026@gmail.com", "zaxw xscx ityn pshi");
+
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+            }
+        }
     }
 }
+//"novateam2026@gmail.com", "zaxw xscx ityn pshi"

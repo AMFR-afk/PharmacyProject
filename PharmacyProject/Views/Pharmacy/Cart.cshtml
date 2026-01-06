@@ -58,8 +58,12 @@
                                         <td class="pe-4 text-end">
                                             <form asp-action="RemoveFromCart" method="post">
                                                 <input type="hidden" name="medicineId" value="@item.MedicineId" />
-                                                <button class="btn btn-link text-danger p-0 opacity-50 hover-opacity-100" title="Remove">
-                                                    <i class="bi bi-x-circle-fill fs-5"></i>
+
+                                                <button type="submit"
+                                                        class="btn btn-outline-danger btn-sm rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center"
+                                                        style="width: 32px; height: 32px; padding: 0;"
+                                                        title="Remove Item">
+                                                    <i class="bi bi-x-lg">X</i>
                                                 </button>
                                             </form>
                                         </td>
