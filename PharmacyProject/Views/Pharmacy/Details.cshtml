@@ -8,48 +8,87 @@
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
         <div class="row g-0">
 
-            <div class="col-md-5 d-flex align-items-center justify-content-center p-5 position-relative" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
-                <i class="bi bi-capsule-pill display-1 text-white" style="font-size: 8rem; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));"></i>
+            <div class="col-md-5 d-flex align-items-center justify-content-center p-5 position-relative"
+                 style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); min-height: 400px;">
+
+                <i class="bi bi-capsule-pill position-absolute text-white"
+                   style="font-size: 15rem; opacity: 0.1; transform: rotate(-15deg); top: -20px; left: -20px;"></i>
+
+                <div class="text-center position-relative">
+                    <div class="bg-white rounded-circle shadow-lg d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width: 180px; height: 180px;">
+                        <i class="bi bi-capsule-pill" style="font-size: 6rem; color: #764ba2;"></i>
+                    </div>
+                    <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2 mt-2 fw-bold">
+                        ID: @Model.Id
+                    </span>
+                </div>
             </div>
 
             <div class="col-md-7 bg-white">
                 <div class="card-body p-5">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
                         <div>
-                            <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 rounded-pill">Pharmacy Product</span>
-                            <h2 class="fw-bold text-dark mb-0">@Model.Name</h2>
+                            <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 rounded-pill fw-bold">
+                                Pharmacy Product
+                            </span>
+                            <h2 class="fw-bold text-dark mb-0 display-6">@Model.Name</h2>
                         </div>
-                        <h2 class="text-primary fw-bold">@Model.Price.ToString("0.00") JOD</h2>
+                        <h2 class="text-primary fw-bold" style="color: #764ba2 !important;">
+                            @Model.Price.ToString("0.00") <small class="fs-6 text-muted">JOD</small>
+                        </h2>
                     </div>
 
-                    <p class="lead text-muted mb-5" style="line-height: 1.8;">
+                    <h5 class="text-muted fw-bold mb-3">Description</h5>
+                    <p class="lead text-secondary mb-5" style="line-height: 1.8; font-size: 1.1rem;">
                         @Model.Details
                     </p>
 
-                    <form asp-action="AddToCart" method="post">
+                    <form asp-action="AddToCart" method="post" class="bg-light p-4 rounded-4 border">
                         <input type="hidden" name="id" value="@Model.Id" />
 
-                        <div class="row g-3 align-items-end">
+                        <div class="row g-3 align-items-center">
                             <div class="col-sm-4">
-                                <label class="form-label fw-bold text-secondary small">Quantity</label>
-                                <input type="number" name="quantity" class="form-control text-center rounded-3 border-2" value="1" min="1" max="10">
+                                <label class="form-label fw-bold text-secondary small text-uppercase">Quantity</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary border-end-0" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" name="quantity" class="form-control text-center border-secondary border-start-0 border-end-0" value="1" min="1" max="10">
+                                    <button class="btn btn-outline-secondary border-start-0" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="col-sm-8">
-                                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm" style="background: linear-gradient(45deg, #667eea, #764ba2); border: none;">
-                                    <i class="bi bi-cart-plus-fill me-2"></i> Add to Cart
+                                <label class="form-label d-none d-sm-block">&nbsp;</label> <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm transition-hover"
+                                                                                                   style="background: linear-gradient(45deg, #667eea, #764ba2); border: none;">
+                                    <i class="bi bi-bag-plus-fill me-2"></i> Add to Cart
                                 </button>
                             </div>
                         </div>
                     </form>
 
-                    <div class="mt-5 pt-3 border-top">
-                        <a asp-action="Table" class="text-decoration-none text-muted fw-bold">
+                    <div class="mt-5 pt-3 border-top d-flex justify-content-between align-items-center">
+                        <a asp-action="Table" class="text-decoration-none text-muted fw-bold hover-link">
                             <i class="bi bi-arrow-left me-1"></i> Back to Store
                         </a>
+                        <small class="text-muted opacity-50">Nova Pharmacy System</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // تأثيرات بسيطة بال CSS
+    document.querySelector('.hover-link').addEventListener('mouseover', function() {
+        this.style.color = '#764ba2';
+    });
+    document.querySelector('.hover-link').addEventListener('mouseout', function() {
+        this.style.color = '#6c757d';
+    });
+</script>

@@ -15,7 +15,7 @@ namespace PharmacyProject.Controllers
 {
     public class PharmacyController : Controller
     {
-        public static ClientProp CurrentUser= null;
+        public static ClientProp CurrentUser = null;
         private readonly ILogger<PharmacyController> _logger;
         private readonly Bridge _context;
         // =======================
@@ -62,18 +62,18 @@ namespace PharmacyProject.Controllers
         // Home / Medicines Talbe
         // =======================
 
-       
+
         [HttpGet]
         public IActionResult Table(string searchString)
         {
-            
+
             if (HttpContext.Session.GetString("UserName") == null) //  فحص تسجيل الدخول
             {
                 return RedirectToAction("Login");
             }
 
-           
-            var medicines = from m in _context.PropTable 
+
+            var medicines = from m in _context.PropTable
                             select m;//  جلب كل الأدوية من الداتابيز
 
 
@@ -107,7 +107,7 @@ namespace PharmacyProject.Controllers
                 return RedirectToAction("Login");
             }
 
-            var data = _context.PropTable.ToList(); 
+            var data = _context.PropTable.ToList();
             return View(data);
         }
 
@@ -120,13 +120,13 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(Prop model) 
+        public async Task<IActionResult> Add(Prop model)
         {
             if (ModelState.IsValid)
             {
                 // إضافة الدواء للداتابيز
-                await _context.PropTable.AddAsync(model); 
-                await _context.SaveChangesAsync();        
+                await _context.PropTable.AddAsync(model);
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction("AdminTable");
             }
@@ -138,10 +138,10 @@ namespace PharmacyProject.Controllers
         // =======================
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id) 
+        public async Task<IActionResult> Edit(int id)
         {
             // البحث عن الدواء بواسطة الـ ID
-            var medicine = await _context.PropTable.FindAsync(id); 
+            var medicine = await _context.PropTable.FindAsync(id);
 
             if (medicine == null)
             {
@@ -152,10 +152,10 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Prop model) 
+        public async Task<IActionResult> Edit(Prop model)
         {
             // 1. نجيب الدواء الأصلي من الداتابيز
-            var existingMedicine = await _context.PropTable.FindAsync(model.Id); 
+            var existingMedicine = await _context.PropTable.FindAsync(model.Id);
 
             if (existingMedicine != null)
             {
@@ -165,7 +165,7 @@ namespace PharmacyProject.Controllers
                 existingMedicine.Details = model.Details;
 
                 // 3. نحفظ التغييرات
-                await _context.SaveChangesAsync(); 
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction("AdminTable");
             }
@@ -201,7 +201,7 @@ namespace PharmacyProject.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddToCart(int id, int quantity = 1) 
+        public IActionResult AddToCart(int id, int quantity = 1)
         {
             var med = _context.PropTable.FirstOrDefault(m => m.Id == id);// جلب الدواء من الداتابيز
 
@@ -384,12 +384,12 @@ namespace PharmacyProject.Controllers
                 return View(newuser);
             }
 
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 newuser.Role = "USER"; // تعيين الدور كـ "User" افتراضياً
 
                 _context.UserData.Add(newuser);
-                await _context.SaveChangesAsync(); 
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction("Login");
             }
@@ -492,6 +492,16 @@ namespace PharmacyProject.Controllers
             {
                 Console.WriteLine($"Error sending email: {ex.Message}");
             }
+        }
+
+        // =======================
+        // Logout
+        // =======================
+        public IActionResult Logout()
+        {
+            // حذف كل بيانات السشن (اسم المستخدم، السلة، الرول)
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
         }
     }
 }

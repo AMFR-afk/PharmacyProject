@@ -4,64 +4,164 @@
     ViewData["Title"] = "Create Account";
 }
 
+<style>
+    /* كرت التسجيل */
+    .signup-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        background: white;
+        transition: transform 0.3s ease;
+    }
+
+        .signup-card:hover {
+            transform: translateY(-5px);
+        }
+
+    /* الهيدر البنفسجي الفخم */
+    .glass-header-small {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        color: white;
+    }
+
+    /* دوائر الزينة في الخلفية */
+    .decoration-circle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    /* تنسيق الحقول */
+    .form-control {
+        border-radius: 0.75rem;
+        border: 2px solid #f1f3f5;
+        padding: 1rem 0.75rem;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1);
+        }
+
+    /* الليبل العائم */
+    .form-floating > label {
+        padding-left: 1rem;
+        color: #6c757d;
+    }
+
+    /* زر التسجيل */
+    .btn-register {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-register:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+            color: white;
+        }
+
+    /* زر العودة */
+    .btn-back {
+        border: 2px solid #e9ecef;
+        color: #6c757d;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        padding: 0.8rem;
+    }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            color: #333;
+            border-color: #dee2e6;
+        }
+</style>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
 
-                <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
-                    <h3 class="fw-bold text-white mb-0">Create Account</h3>
-                    <p class="text-white-50 small mb-0">Join our pharmacy community</p>
+            <div class="card signup-card">
+
+                <div class="glass-header-small">
+                    <div class="decoration-circle" style="top: -30px; left: -30px; width: 100px; height: 100px;"></div>
+                    <div class="decoration-circle" style="bottom: -20px; right: -20px; width: 80px; height: 80px;"></div>
+                    <div class="decoration-circle" style="top: 20px; right: 40px; width: 20px; height: 20px;"></div>
+
+                    <h2 class="fw-bold mb-2 position-relative">Create Account</h2>
+                    <p class="mb-0 opacity-75 position-relative">Join Nova Pharmacy Community today!</p>
                 </div>
 
-                <div class="card-body p-5 bg-white">
+                <div class="card-body p-4 p-md-5">
                     <form asp-action="SignUp" method="post">
 
-                        <div class="row g-2 mb-3">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="Name" class="form-control rounded-3" placeholder="First Name" />
+                                    <input asp-for="Name" class="form-control" placeholder="First Name" />
                                     <label asp-for="Name">First Name</label>
-                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                    <span asp-validation-for="Name" class="text-danger small ps-2"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input asp-for="Surname" class="form-control rounded-3" placeholder="Last Name" />
+                                    <input asp-for="Surname" class="form-control" placeholder="Last Name" />
                                     <label asp-for="Surname">Last Name</label>
-                                    <span asp-validation-for="Surname" class="text-danger small"></span>
+                                    <span asp-validation-for="Surname" class="text-danger small ps-2"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Email" class="form-control rounded-3" placeholder="name@example.com" />
+                            <input asp-for="Email" class="form-control" placeholder="name@example.com" />
                             <label asp-for="Email">Email Address</label>
-                            <span asp-validation-for="Email" class="text-danger small"></span>
+                            <span asp-validation-for="Email" class="text-danger small ps-2"></span>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="PhoneNumber" class="form-control rounded-3" placeholder="Phone" />
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Phone" />
                             <label asp-for="PhoneNumber">Phone Number</label>
-                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            <span asp-validation-for="PhoneNumber" class="text-danger small ps-2"></span>
                         </div>
 
                         <div class="form-floating mb-4">
-                            <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="Password" />
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
                             <label asp-for="Password">Password</label>
-                            <span asp-validation-for="Password" class="text-danger small"></span>
+                            <span asp-validation-for="Password" class="text-danger small ps-2"></span>
                         </div>
 
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success btn-lg fw-bold rounded-3 shadow-sm" style="background: linear-gradient(45deg, #198754, #20c997); border: none;">
-                                Register Now
+                        <div class="d-grid gap-3 mt-4">
+                            <button type="submit" class="btn btn-register">
+                                <i class="bi bi-person-plus-fill me-2"></i> Register Now
                             </button>
-                            <a asp-action="Login" class="btn btn-outline-secondary rounded-3">Back to Login</a>
+
+                            <a asp-action="Login" class="btn btn-back text-center text-decoration-none">
+                                <i class="bi bi-arrow-left me-1"></i> Already have an account? Login
+                            </a>
                         </div>
 
                     </form>
                 </div>
             </div>
+
+            <div class="text-center mt-4 text-muted small">
+                &copy; 2026 Nova Pharmacy System. All rights reserved.
+            </div>
+
         </div>
     </div>
 </div>
